@@ -5,9 +5,9 @@ import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import javax.persistence.NoResultException;
 import javax.persistence.TypedQuery;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public class UserDaoImp implements UserDao {
@@ -21,21 +21,17 @@ public class UserDaoImp implements UserDao {
     }
 
     @Override
-    public User getUserByModelAndSeries(String model, int series) {
-        String hql = "SELECT u FROM User u WHERE u.car.model = :model AND u.car.series = :series";
+    public Optional<User> getUserByModelAndSeries(String model, int series) {
+        String hql = "SELECT u FROM User u JOIN FETCH u.car WHERE u.car.model = :model AND u.car.series = :series";
         TypedQuery<User> query = sessionFactory.getCurrentSession().createQuery(hql, User.class);
         query.setParameter("model", model);
         query.setParameter("series", series);
-        try {
-            return query.getSingleResult();
-        } catch (NoResultException e) {
-            return null;
-        }
+            return query.getResultList().stream().findFirst();
     }
 
     @Override
     public List<User> listUsers() {
-        TypedQuery<User> query = sessionFactory.getCurrentSession().createQuery("from User");
+        TypedQuery<User> query = sessionFactory.getCurrentSession().createQuery("SELECT u FROM User u JOIN FETCH u.car");
         return query.getResultList();
     }
 

@@ -34,7 +34,7 @@ public class MainApp {
             System.out.println();
         }
 
-        System.out.println(userService.getUserByModelAndSeries("car1", 1));
+        System.out.println(userService.getUserByModelAndSeries("car1", 1).orElse(null));
 
         context.close();
     }
